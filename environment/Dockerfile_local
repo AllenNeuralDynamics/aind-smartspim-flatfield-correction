@@ -1,14 +1,18 @@
 FROM continuumio/miniconda3:23.9.0-0
+LABEL maintainer="Camilo Laiton <camilo.laiton@alleninstitute.org>"
 
 ARG DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get update
-RUN conda create -n flatfield_estimation python=3.9 -y && conda clean -afy
-SHELL ["conda", "run", "-n", "flatfield_estimation", "/bin/bash", "-c"]
+RUN apt-get update && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-RUN pip install -U --no-cache-dir \
+RUN conda create -n flatfield_estimation python=3.9 --no-default-packages -y && \
+    conda clean --all --yes
+
+ENV PATH="/opt/conda/envs/flatfield_estimation/bin:$PATH"
+
+RUN conda run -n flatfield_estimation pip install --no-cache-dir \
     aind-data-schema==1.0.0 \
-    dask[distributed] \
+    "dask[distributed]" \
     numpy==1.24.2 \
     BaSiCPy==1.1.0 \
     jax==0.4.23 \
